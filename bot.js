@@ -118,5 +118,4 @@ client.on('message', msg => {
 
 });
 // bot token
-client.login('');
-//https://discordapp.com/oauth2/authorize?client_id=445749869106298891&scope=bot
+client.login(process.env.BOT_TOKEN);
