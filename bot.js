@@ -3,7 +3,8 @@ const client = new Discord.Client();
 const fs = require("fs");
 // set bot prefix
 const prefix = "!";
-const request = require("superagent");
+//const request = require("superagent");
+const axios = require("axios")
 const Canvas = require("canvas");
 const path = require("path");
 const getProp = require("dotprop");
@@ -11,7 +12,7 @@ const snekfetch = require("snekfetch");
 require("dotenv").config();
 
 const key = process.env.API_KEY;
-
+const baseURL = process.env.BASEURL
 const unames = JSON.parse(
   fs.readFileSync("./uname.json", "utf8", function(err) {
     if (err) console.log("error", err);
@@ -54,38 +55,25 @@ client.on("message", async msg => {
       );
     } else {
       let cover;
-      //async function doIt(){
-      //var trackStream = lastfm.stream(`${unames[message.author.id].username}`);
-      const result = request.get(
-        `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=firstcomrade17&api_key=1336029958418997879ebb165f5fbb3f&format=json&limit=1`
-      );
-      result.then(res => {
-        //parseString(res.text, (err, obj) => {
-        const track = res.body.recenttracks.track[0];
-        console.log(track.image[1]["#text"]);
-        //const track = tracks[0];
-        let artist = track.artist["#text"];
-        let trackName = track.name;
-        //let timestamp = new Date().getTime();
-        let album = track.album["#text"];
-        cover = track.image[1]["#text"];
-      });
-      //})
-      /*
-          const resultTwo = request.get(`http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=firstcomrade17&api_key=1336029958418997879ebb165f5fbb3f&format=json`);
-          resultTwo.then((res) => {
-            //parseString(res.text, (err, obj) => {
-          
-          let image = res.body.user.image[1]['#text'];
-            })*/
-      //})
+      let getInfo = axios.create({
+          baseURL, 
+          url: `?method=user.getrecenttracks&user=firstcomrade17&api_key=1336029958418997879ebb165f5fbb3f&format=json&limit=1`
+      })
+        getInfo().then(response => {
+          const track = response.data.recenttracks.track[0];
+          console.log(track.image[1]["#text"]);
+          let artist = track.artist["#text"];
+          let trackName = track.name;
+          let album = track.album["#text"];
+          cover = track.image[1]["#text"];
+        });
 
       //const Image = Canvas.Image;
+
       const canvas = Canvas.createCanvas(600, 150);
       const ctx = canvas.getContext("2d");
-      const base = await Canvas.loadImage("base.png");
-      //const userAvatar = await new Image();
-      const { body: buffer } = await snekfetch.get(cover);
+      const base = Canvas.loadImage("base.png");
+      const { body: buffer } = snekfetch.get(cover);
       const albumCover = Canvas.loadImage(buffer);
       //const generate = () => {
       //ctx.drawImage(userAvatar, 530, 80, 590, 140);
@@ -102,7 +90,6 @@ client.on("message", async msg => {
       ctx.drawImage(base, 0, 0);
       //};
 
-      //userAvatar.src = await userImage.image[1]['#text'];
       //generate();
       //var buf = await canvas.toBuffer()
       // var toSend = await fs.writeFileSync("test.png", buf);
@@ -114,6 +101,7 @@ client.on("message", async msg => {
       //setTimeout(function(){channel.send(attachment);}, 3000)
       console.log("test");
     }
+
     /*
     doIt().then(v => {
         console.log("lol");  
