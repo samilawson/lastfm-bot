@@ -3,11 +3,9 @@ const client = new Discord.Client();
 const fs = require("fs");
 // set bot prefix
 const prefix = "!";
-//const request = require("superagent");
 const axios = require("axios")
 const Canvas = require("canvas");
 const path = require("path");
-const getProp = require("dotprop");
 const snekfetch = require("snekfetch");
 require("dotenv").config();
 
