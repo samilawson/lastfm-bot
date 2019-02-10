@@ -1,11 +1,10 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require("fs");
-const unames = JSON.parse(fs.readFileSync("./uname.json", "utf8"));
 // set bot prefix 
 const prefix = "!";
 const request = require('superagent');
-const Canvas = require('canvas-prebuilt');
+const Canvas = require('canvas');
 const path = require('path');
 const getProp = require('dotprop');
 
@@ -17,6 +16,10 @@ var lastfm = new LastFmNode({
     secret: "e8d41bd03855ea5dee5a1fa0393613bd"
 });
 */
+const unames = JSON.parse(fs.readFileSync("./uname.json", "utf8", function(err) {
+    if(err) console.log('error', err);
+}));
+
 client.on('ready', () => {
     console.log('Ready!');
 });
@@ -42,6 +45,10 @@ client.on('message', msg => {
 }
     // fm image command
    else if(command === "fmi"){
+       let artist;
+       let trackName;
+       let album;
+       let cover;
        if(!unames[msg.author.id]){
            msg.channel.send(`@${msg.author.id}, you don't seem to have your username set! Type !register *username* to set it!`);
 
@@ -53,30 +60,31 @@ client.on('message', msg => {
             //parseString(res.text, (err, obj) => {
           const track = res.body.recenttracks.track[0];
           //const track = tracks[0];
-          let artist = track.artist['#text'];
-          let trackName = track.name;
+          artist = track.artist['#text'];
+          trackName = track.name;
           //let timestamp = new Date().getTime();
-          let album = track.album['#text'];
-          let cover = track.image[1]['#text'];
+          album = track.album['#text'];
+          cover = track.image[1]['#text'];
             })
         //})
+        /*
           const resultTwo = request.get(`http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=firstcomrade17&api_key=1336029958418997879ebb165f5fbb3f&format=json`);
           resultTwo.then((res) => {
             //parseString(res.text, (err, obj) => {
           
           let image = res.body.user.image[1]['#text'];
-            })
+            })*/
         //})
         
           const Image = Canvas.Image;
-          const canvas = new Canvas(600, 150);
+          const canvas = new Canvas.createCanvas(600, 150);
           const ctx = canvas.getContext('2d');
-            const base = await new Image();
-            const userAvatar = await new Image();
+            const base = await Canvas.loadImage('base.png')
+            //const userAvatar = await new Image();
             const albumCover = await new Image();
             const generate = () => {
-                ctx.drawImage(userAvatar, 530, 80, 590, 140);
-                ctx.drawImage(albumCover, 15, 15, 132, 132);
+                //ctx.drawImage(userAvatar, 530, 80, 590, 140);
+                ctx.drawImage(cover, 15, 15, 132, 132);
                 ctx.fillText(artist, 148, 80, 246);
                 ctx.fillText(trackName, 148, 40, 246);
                 ctx.fillText(album, 148, 120, 246);
@@ -88,13 +96,17 @@ client.on('message', msg => {
                 ctx.putImageData(imgData, 0, 0);
                ctx.drawImage(base, 0, 0);
             };
-            base.src = await fs.readFile(path.join(__dirname, 'base.png'));
+            
             
             //userAvatar.src = await userImage.image[1]['#text'];
-            generate();
+             generate();
             var buf = await canvas.toBuffer()
             var toSend = await fs.writeFileSync("test.png", buf);
             setTimeout(function(){msg.channel.send('', {file: 'test.png'})}, 3000);
+            //const attachment = new Discord.Attachment(await buf, 'test.png');
+
+	        //setTimeout(function(){channel.send(attachment);}, 3000)
+
             
        }
     doIt().then(v => {
@@ -106,5 +118,5 @@ client.on('message', msg => {
 
 });
 // bot token
-client.login('NDQ1NzQ5ODY5MTA2Mjk4ODkx.DdvAdw.ZC1jUu3nrS9HaXRq1dIUk3n2pQQ');
+client.login('');
 //https://discordapp.com/oauth2/authorize?client_id=445749869106298891&scope=bot
