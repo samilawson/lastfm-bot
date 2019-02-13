@@ -10,7 +10,6 @@ const Canvas = require("Canvas");
 const Image = require('Canvas').Image; 
 
 const path = require("path");
-const snekfetch = require("snekfetch");
 require("dotenv").config();
 
 const key = process.env.API_KEY;
