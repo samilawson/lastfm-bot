@@ -6,7 +6,9 @@ const prefix = "!";
 const request = require("request-promise");
 const { promisifyAll } = require('tsubaki');
 
-const Canvas = require("canvas");
+const Canvas = require("Canvas");
+const Image = require('Canvas').Image; 
+
 const path = require("path");
 const snekfetch = require("snekfetch");
 require("dotenv").config();
@@ -72,16 +74,25 @@ client.on("message", async msg => {
       let toUser = JSON.parse(info)
       const toImage = toUser.user.image[2]['#text']
      
+      function loadImage(url) {
+        return new Promise(r => { let i = new Image(); i.onload = (() => r(i)); i.src = url; });
+      }
+      
+      var img = await loadImage(toImage)
+      var nextImg = await loadImage(cover)
 
-
-      let toBase = await fs.readFileAsync("base.png");
+      let toBase = await fs.readFile('./base.png', 'utf8', function(err, data) {  
+        if (err) throw err;
+        //console.log(data);
+        return data;
+    });
      
       
       const canvas = Canvas.createCanvas(600, 150);
       const ctx = canvas.getContext("2d");
       const base = Canvas.loadImage(toBase);
-      const userAvatar = Canvas.loadImage(toImage);
-      const albumCover = Canvas.loadImage(cover);
+      const userAvatar = Canvas.loadImage(img);
+      const albumCover = Canvas.loadImage(nextImg);
       const generate = () => {
         ctx.drawImage(base, 0, 0);
 
